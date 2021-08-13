@@ -30,6 +30,7 @@ namespace tacarez_docusign_webhook
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 CosmosHelper ch = new CosmosHelper();
                 await ch.WriteEventDataToDatabase(data);
+                await ch.UpdateEnvelopeStatus(data);
             }       
             return new OkObjectResult("");
         }
