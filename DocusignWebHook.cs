@@ -18,20 +18,36 @@ namespace tacarez_docusign_webhook
     {
         [FunctionName("DocusignWebHook")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "events")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "events")] HttpRequest req,
             ILogger log)
         {
             var headers = req.Headers;
-            StringValues authValue;
-            bool headerExist = headers.TryGetValue("Authorization", out authValue);
-            if (authValue.ToString().Contains(System.Environment.GetEnvironmentVariable("basicAuthToken")))
-            {
+            //StringValues authValue;
+            //bool headerExist = headers.TryGetValue("Authorization", out authValue);
+            //if (authValue.ToString().Contains(System.Environment.GetEnvironmentVariable("basicAuthToken")))
+            //{
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 CosmosHelper ch = new CosmosHelper();
-                await ch.WriteEventDataToDatabase(data);
-                await ch.UpdateEnvelopeStatus(data);
-            }       
+                try
+                {
+                    await ch.WriteEventDataToDatabase(data);
+                }
+                catch (Exception e)
+                {
+
+                    throw e;
+                }
+                try
+                {
+                    await ch.UpdateEnvelopeStatus(data);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                
+            //}       
             return new OkObjectResult("");
         }
     }

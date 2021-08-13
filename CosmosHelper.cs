@@ -112,7 +112,10 @@ namespace tacarez_docusign_webhook
                     newRecipientStatus.DeliveredDateTime = signer.deliveredDateTime;
                     recipientStatusList.Add(newRecipientStatus);
                 });
-
+                if (docusignBody.status == "completed")
+                {
+                    mergeRequest.Status = "Complete";
+                }
                 mergeRequest.StakeholderReview.EnvelopeStatus = recipientStatusList;
                 mergeRequest.LastModifiedDate = DateTime.Now;
                 var replaceItemResponse = await _container.ReplaceItemAsync<MergeRequest>(mergeRequest, mergeRequest.Id, new PartitionKey("merge"));
